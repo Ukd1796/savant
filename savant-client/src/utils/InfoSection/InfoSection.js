@@ -1,7 +1,8 @@
-import React from 'react'
+import React, {useEffect,useState} from 'react'
 import {InfoSec, InfoRow, InfoColumn, TextWrapper, TopLine, Heading, Subtitle, ImgWrapper, Img} from './InfoSection.elements'
 import { Container, Button } from '../../globalStyles'
-import { Link } from 'react-router-dom'
+import { UserAuth } from '../../context/AuthContext'
+import { useNavigate,Link } from 'react-router-dom';
 
  const InfoSection = ({ 
     
@@ -19,6 +20,24 @@ import { Link } from 'react-router-dom'
     imgStart,
     start
 }) => {
+
+    const { googleSignIn, user } = UserAuth();
+    const navigate = useNavigate();
+    const [active,setActive] = useState(false);
+  
+    const handleGoogleSignIn = async () => {
+      try {
+        await googleSignIn();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    useEffect(()=>{
+        if(user) {
+          setActive(true);
+        } 
+      },[user]);
     return (
         <>
             <InfoSec lightBg={lightBg}>
@@ -29,11 +48,18 @@ import { Link } from 'react-router-dom'
                             <TopLine lightTopLine={lightTopLine}>{topLine}</TopLine>
                             <Heading lightText={lightText}>{headline}</Heading>
                             <Subtitle lightTextDesc={lightTextDesc}>{description}</Subtitle>
-                            <Link to='/sign-up'>
-                            <Button big fontBig primary={primary}>
-                                {buttonLabel}
+                            {
+                            !active ?
+                            <Button big fontBig primary={primary} onClick={handleGoogleSignIn}>
+                                Get Started
+                            </Button>
+                            :
+                            <Link href="/workspace">
+                            <Button big fontBig primary={primary} onClick={handleGoogleSignIn}>
+                                Start Researching
                             </Button>
                             </Link>
+                            }
                             </TextWrapper>
                         </InfoColumn>
                         <InfoColumn>

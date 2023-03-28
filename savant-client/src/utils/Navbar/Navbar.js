@@ -85,7 +85,7 @@ function Navbar() {
                             </NavLinks>
                         </NavItem>
                     
-                        <NavItemBtn >
+                        {/* <NavItemBtn >
                             {button ? (
                                 <NavBtnLink to='/sign-up'>
                                     <Button primary>SIGN IN</Button>
@@ -96,7 +96,7 @@ function Navbar() {
                                 </NavBtnLink>
                             )}
                             
-                        </NavItemBtn>
+                        </NavItemBtn> */}
                     </NavMenu>
                 </NavbarContainer>
             </Nav>
