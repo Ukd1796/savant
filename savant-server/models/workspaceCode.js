@@ -8,4 +8,4 @@ const workspaceCodeSchema = new Schema({
     }
 })
 
-module.exports = mongoose.model('workspaceCode', workspaceCodeSchema);
+module.exports = mongoose.model('WorkspaceCode', workspaceCodeSchema);
