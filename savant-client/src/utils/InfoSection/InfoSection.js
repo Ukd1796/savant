@@ -54,8 +54,8 @@ import { useNavigate,Link } from 'react-router-dom';
                                 Get Started
                             </Button>
                             :
-                            <Link href="/workspace">
-                            <Button big fontBig primary={primary} onClick={handleGoogleSignIn}>
+                            <Link to="/workspace">
+                            <Button big fontBig primary={primary}>
                                 Start Researching
                             </Button>
                             </Link>

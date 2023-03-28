@@ -1,11 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router} from 'react-router-dom' 
-import GlobalStyles from './globalStyles'
-import { Navbar, Footer } from './utils';
+import { BrowserRouter as Router,Route,Routes} from 'react-router-dom';
 import Home from './components/HomePage/Home';
-import ScrollToTop from './utils/ScrollToTop';
 import {motion} from 'framer-motion';
 import { AuthContextProvider } from './context/AuthContext';
+import WorkSpace from './components/WorkSpace/WorkSpace';
 
 
 const variants = {
@@ -26,11 +24,10 @@ function App() {
 >
   <AuthContextProvider>
       <Router>
-          <GlobalStyles />
-          <ScrollToTop />
-          <Navbar />
-          <Home/>
-          <Footer />
+      <Routes>
+      <Route path="/" exact element={<Home/>}/>
+      <Route path="/workspace" element={<WorkSpace/>} />
+      </Routes>
       </Router>
     </AuthContextProvider>
     </motion.main>
