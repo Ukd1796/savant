@@ -4,7 +4,24 @@ const mongoose = require("mongoose")
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
+const workspaceRoutes = require('./routes/workspace')
+
+app.use('/workspaces',workspaceRoutes)
+
+app.use((req, res, next) => {
+    const err = new Error("Not Found");
+    err.statusCode = 404;
+    next(err);
+})
+
+app.use((err, req, res, next) => {
+    console.log(err);
+    const status = err.statusCode || 500;
+    const message = err.message;
+    res.status(status).json({message: message});
+})
 
 mongoose.connect('mongodb+srv://ukdwiwedi1796:Cju8jPX9c1yvCSmE@cluster0.vakvxjl.mongodb.net/?retryWrites=true&w=majority', 
 { 

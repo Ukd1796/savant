@@ -55,8 +55,7 @@ exports.getWorkspaces = (req, res, next) => {
             next(err);
         })
     }
-    else
-    {
+    else {
         const err = new Error("Invalid Values")
         err.statusCode = 422
         next(err);
@@ -66,7 +65,7 @@ exports.getWorkspaces = (req, res, next) => {
 exports.joinWorkspace = (req, res, next) => {
     const userEmail = req.body.userEmail;
     const workspaceCode = req.body.workspaceCode;
-    Classroom.findOne({workspaceCode: workspaceCode})
+    Classroom.findOne({ workspaceCode: workspaceCode })
         .then(workspace => {
             if (!workspace) {
                 const err = new Error("No such workspace");
@@ -82,7 +81,7 @@ exports.joinWorkspace = (req, res, next) => {
             return workspace.save();
         })
         .then(result => {
-            return WorkspaceMemb.findOne({email: userEmail});
+            return WorkspaceMemb.findOne({ email: userEmail });
         })
         .then(workspaceMemb => {
             if (workspaceMemb.workspaceOwned.indexOf(workspaceCode) >= 0) {
@@ -94,9 +93,61 @@ exports.joinWorkspace = (req, res, next) => {
             return workspaceMemb.save();
         })
         .then(result => {
-            res.json({message: "Workspace joined successfully!"});
+            res.json({ message: "Workspace joined successfully!" });
         })
         .catch(err => {
             next(err);
         })
 }
+
+exports.deleteWorkspace = (req, res, next) => {
+    const workspaceCode = req.body.workspaceCode;
+    Workspace.findByIdAndDelete({ workspaceCode: workspaceCode }).then(async workspace => {
+        if (!workspace) {
+            const err = new Error("Workspace Code does not exist");
+            err.statusCode = 422;
+            next(err);
+        }
+
+        workspace.members.forEach(async memberEmail => {
+            await WorkspaceMemb.findOne({email: memberEmail})
+                .then(workspaceMemb => {
+                    if (workspaceMemb) {
+                        workspaceMemb.workspaceEnrolled = workspaceMemb.workspaceEnrolled.filter(workspaceEnrolledCode => {
+                            return workspaceEnrolledCode.toString() !== workspaceCode;
+                        });
+        
+                        workspaceMemb.workspaceOwned = workspaceMemb.workspaceOwned.filter(workspaceOwnedCode => {
+                            return workspaceOwnedCode.toString() !== workspaceCode;
+                        });
+        
+                        user.save();
+                    }
+                })
+                .catch(err => {
+                    next(err);
+                })
+        })
+})
+
+exports.getWorkspace = (req,res,next) =>{
+    const workspaceCode = req.body.workspaceCode;
+    Workspace.findOne({workspaceCode:workspaceCode})
+    .then(workspace=>{
+        if(!workspace)
+        {
+            const err = new Error("Invalid workspace code.")
+            err.statusCode = 422;
+            next(err);
+        }
+        res.json(workspace)
+    })
+    .catch(err=>{
+        next(err);
+    })
+}
+
+
+
+}
+        
