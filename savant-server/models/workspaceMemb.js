@@ -10,8 +10,8 @@ const workspaceMembSchema = new Schema({
         type: String,
         required: true
     },
-     workspaceEnrolled: [Number],
-     workspaceOwned: [Number]
+     workspacesEnrolled: [Number],
+     workspacesOwned: [Number]
 
 },
    {

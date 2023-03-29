@@ -23,6 +23,12 @@ exports.createWorkspace = async (req, res, next) => {
     })
 
     newWorkspace.save().then(result => {
+        WorkspaceMemb.findOne({email: req.body.adminEmail}).then(workspacememb => {
+            workspacememb.workspacesOwned.push(recentWorkCode);
+            workspacememb.save();
+        }).catch(err => {
+            next(err);
+        })
         res.status(201).json({ message: "Workspace created successfully" });
     }).catch(err => {
         next(err);
@@ -33,7 +39,7 @@ exports.createWorkspace = async (req, res, next) => {
 exports.getWorkspaces = (req, res, next) => {
     const type = req.body.type;
     const userEmail = req.body.userEmail;
-    if (type == "creator") {
+    if (type === "creator") {
         Workspace.find({ adminEmail: userEmail }).then(results => {
             res.json(results);
         }).catch(err => {
@@ -41,9 +47,9 @@ exports.getWorkspaces = (req, res, next) => {
         })
 
     }
-    else if (type == "collaborator") {
-        WorkspaceMemb.findOne({ email: userEmail }).then(collaborator => {
-            Workspace.find({ workspaceCode: collaborator.workspaceCode }).
+    else if (type === "collaborator") {
+        WorkspaceMemb.findOne({ email: userEmail }).then(workspacememb => {
+            Workspace.find({ workspaceCode: workspacememb.workspacesEnrolled }).
                 then(results => {
                     res.json(results);
                 })
@@ -65,7 +71,7 @@ exports.getWorkspaces = (req, res, next) => {
 exports.joinWorkspace = (req, res, next) => {
     const userEmail = req.body.userEmail;
     const workspaceCode = req.body.workspaceCode;
-    Classroom.findOne({ workspaceCode: workspaceCode })
+    Workspace.findOne({ workspaceCode: workspaceCode })
         .then(workspace => {
             if (!workspace) {
                 const err = new Error("No such workspace");
@@ -83,14 +89,14 @@ exports.joinWorkspace = (req, res, next) => {
         .then(result => {
             return WorkspaceMemb.findOne({ email: userEmail });
         })
-        .then(workspaceMemb => {
-            if (workspaceMemb.workspaceOwned.indexOf(workspaceCode) >= 0) {
+        .then(workspacememb => {
+            if (workspacememb.workspacesOwned.indexOf(workspaceCode) >= 0) {
                 const err = new Error("User already the owner of the workspace")
                 err.statusCode = 403;
                 next(err);
             }
-            workspaceMemb.workspaceEnrolled.push(workspaceCode);
-            return workspaceMemb.save();
+            workspacememb.workspacesEnrolled.push(workspaceCode);
+            return workspacememb.save();
         })
         .then(result => {
             res.json({ message: "Workspace joined successfully!" });
@@ -111,17 +117,17 @@ exports.deleteWorkspace = (req, res, next) => {
 
         workspace.members.forEach(async memberEmail => {
             await WorkspaceMemb.findOne({email: memberEmail})
-                .then(workspaceMemb => {
-                    if (workspaceMemb) {
-                        workspaceMemb.workspaceEnrolled = workspaceMemb.workspaceEnrolled.filter(workspaceEnrolledCode => {
+                .then(workspacememb => {
+                    if (workspacememb) {
+                        workspacememb.workspacesEnrolled = workspacememb.workspacesEnrolled.filter(workspaceEnrolledCode => {
                             return workspaceEnrolledCode.toString() !== workspaceCode;
                         });
         
-                        workspaceMemb.workspaceOwned = workspaceMemb.workspaceOwned.filter(workspaceOwnedCode => {
+                        workspacememb.workspacesOwned = workspacememb.workspacesOwned.filter(workspaceOwnedCode => {
                             return workspaceOwnedCode.toString() !== workspaceCode;
                         });
         
-                        user.save();
+                        workspacememb.save();
                     }
                 })
                 .catch(err => {
@@ -129,6 +135,7 @@ exports.deleteWorkspace = (req, res, next) => {
                 })
         })
 })
+}
 
 exports.getWorkspace = (req,res,next) =>{
     const workspaceCode = req.body.workspaceCode;
@@ -145,9 +152,5 @@ exports.getWorkspace = (req,res,next) =>{
     .catch(err=>{
         next(err);
     })
-}
-
-
-
 }
         
