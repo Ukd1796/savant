@@ -3,6 +3,10 @@ const router = express.Router();
 
 const workspaceController = require("../controllers/workspace");
 
+router.get("/",(req,res,next)=>{
+    res.json({message:"This exists"});
+})
+
 router.post('/createWorkspace', workspaceController.createWorkspace);
 router.post('/getWorkspaces', workspaceController.getWorkspaces);
 router.post('/joinWorkspace', workspaceController.joinWorkspace);

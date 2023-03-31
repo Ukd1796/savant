@@ -10,8 +10,6 @@ const CreateWorkSpace = (props) => {
         workspaceName: "",
         desc: ""
     });
-    const [showModal, setShowModal] = useState(false);
-
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -22,7 +20,7 @@ const CreateWorkSpace = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        axios.post("http:localhost:5000/workspaces/createWorkspace", {
+        axios.post("http://localhost:5000/workspaces/createWorkspace", {
             adminEmail: user?.email,
             workspaceName: values.workspaceName,
             desc: values.desc,
